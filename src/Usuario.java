@@ -1,4 +1,3 @@
-import java.util.List;
 import java.util.ArrayList;
 import java.util.List;
 import java.math.BigDecimal;
@@ -105,24 +104,49 @@ public class Usuario {
 
     // metodos
     public void registrarCarro(Carro carro) {
+        if (carro == null) {
+            throw new IllegalArgumentException("carro não pode ser nulo");
+        }
         carros.add(carro);
         System.out.println("Carro " + carro.getPlaca() + " registrado com sucesso.");
     }
 
     public void registrarCartao(Cartao cartao) {
+        if (cartao == null) {
+            throw new IllegalArgumentException("cartao não pode ser nulo");
+        }
         cartoes.add(cartao);
         System.out.println("Cartão " + cartao.getNumeroCartao() + " adicionado.");
     }
 
     public void realizarPagamento(Sessao sessao, String tipo) {
+        if (sessao == null) {
+            throw new IllegalArgumentException("sessao não pode ser nula");
+        }
+        // Encerrar sessão primeiro para garantir que o valor seja calculado
+        sessao.encerrarSessao();
+
         BigDecimal valor = sessao.getValor();
+        if (valor == null) {
+            valor = BigDecimal.ZERO;
+        }
+
         Pagamento pagamento = new Pagamento(pagamentos.size() + 1, this, sessao, valor, LocalDateTime.now(), tipo);
         pagamentos.add(pagamento);
+        // associar pagamento à sessão
+        sessao.setPagamento(pagamento);
+
+        // confirmar pagamento (ainda imprime mensagem, não recalcula o valor do pagamento)
         pagamento.confirmarPagamento(sessao);
-        receberNotificacao(new Notificacao(1, this, "Pagamento Confirmado", "Pagamento da sessão foi concluído.", LocalDateTime.now()));
+
+        // usar id dinâmico para notificação
+        receberNotificacao(new Notificacao(notificacoes.size() + 1, this, "Pagamento Confirmado", "Pagamento da sessão foi concluído.", LocalDateTime.now()));
     }
 
     public void receberNotificacao(Notificacao notificacao) {
+        if (notificacao == null) {
+            throw new IllegalArgumentException("notificacao não pode ser nula");
+        }
         notificacoes.add(notificacao);
         System.out.println(" Notificação: " + notificacao.getTitulo() + " - " + notificacao.getMensagem());
     }
